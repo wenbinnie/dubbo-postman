@@ -126,7 +126,7 @@ public class Initializer {
 
             byte[] bytes;
 
-            URL url = this.getClass().getClassLoader().getResource("config/setting.xml");
+            URL url = this.getClass().getClassLoader().getResource("config/setting_bak.xml");
             String content = FileWithString.file2String(url);
             bytes = content.getBytes();
 
@@ -164,11 +164,11 @@ public class Initializer {
 
             transformer.transform(source, result);
 
-            logger.info("setting.xml 更新成功");
+            logger.info("setting_bak.xml 更新成功");
 
         } catch (Exception e) {
 
-            logger.error("setting.xml 更新失败");
+            logger.error("setting_bak.xml 更新失败");
 
             throw e;
         }

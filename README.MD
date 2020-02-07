@@ -1,7 +1,7 @@
 DUBBO-POSTMAN
 ==========
 
-<img src="https://github.com/everythingbest/dubbo-postman/blob/master/gif/logo.png?raw=true" alt="dubbo postman logo" height="90px" align="right" />
+<img src="https://github.com/xuanxuanlovelife/dubbo-postman/blob/master/gif/logo.png?raw=true" alt="dubbo postman logo" height="90px" align="right" />
 
 **DUBBO-POSTMAN**: 一个用于通过web-ui页面访问dubbo接口的工具,灵感源于
 [postman](https://www.getpostman.com/products)
@@ -30,8 +30,14 @@ DUBBO-POSTMAN UI
 下载源码到本地
 
 ```
-git clone https://github.com/everythingbest/dubbo-postman.git
+git clone https://github.com/xuanxuanlovelife/dubbo-postman.git
+
+先尝试
 npm install --registry=https://registry.npm.taobao.org
+
+若安装依赖失败
+npm install -g cnpm --registry=https://registry.npm.taobao.org
+cnpm install
 ```
 
 ### 本地调试
@@ -64,37 +70,32 @@ DUBBO-POSTMAN BACKEND
 1. **nexus.url**: 私服仓库地址.
 1. **nodex.ip**: redis哨兵配置.
 
+## Redis Sentinel 集群搭建 
+[单机(win10)使用Docker搭建Redis集群（Redis Sentinel 集群部署）](https://www.jianshu.com/p/a5e3ce44bacb)
+
+## Docker 搭建nexus私服
+[Docker 搭建nexus私服](https://www.cnblogs.com/xiao987334176/p/12108560.html)
+
+## 验证
+需要把一个dubbo facade传到nexus
+可使用https://github.com/liuyi01/springboot-dubbo-demo来调试
+
 使用演示
 ===============
 
 <p align="center">
 dubbo demo创建
-<img align="center" alt="face" src="https://github.com/everythingbest/dubbo-postman/blob/master/gif/dubbo-postman-1.gif?raw=true" />
+<img align="center" alt="face" src="https://github.com/xuanxuanlovelife/dubbo-postman/blob/master/gif/dubbo-postman-1.gif?raw=true" />
 </p>
 <p align="center">
 创建服务
- <img align="center" alt="face" src="https://github.com/everythingbest/dubbo-postman/blob/master/gif/dubbo-postman-2.gif?raw=true" />
+ <img align="center" alt="face" src="https://github.com/xuanxuanlovelife/dubbo-postman/blob/master/gif/dubbo-postman-2.gif?raw=true" />
 </p>
 <p align="center">
 场景测试
- <img align="center" alt="face" src="https://github.com/everythingbest/dubbo-postman/blob/master/gif/dubbo-postman-3.gif?raw=true" />
+ <img align="center" alt="face" src="https://github.com/xuanxuanlovelife/dubbo-postman/blob/master/gif/dubbo-postman-3.gif?raw=true" />
 </p>
 <p align="center">
 注册中心添加
- <img align="center" alt="face" src="https://github.com/everythingbest/dubbo-postman/blob/master/gif/dubbo-postman-4.gif?raw=true" />
+ <img align="center" alt="face" src="https://github.com/xuanxuanlovelife/dubbo-postman/blob/master/gif/dubbo-postman-4.gif?raw=true" />
 </p>
-
-赞赏
-===============
-
-如果你觉得这个项目帮助到了你，你可以帮作者买一杯果汁表示鼓励 🍹
-<table>
-  <tr>
-      <td width="50%" align="center"><b>AliPay</b></td>
-      <td width="50%" align="center"><b>WechatPay</b></td>
-  </tr>
-  <tr>
-     <td><img src="https://github.com/everythingbest/dubbo-postman/blob/master/gif/alipay.JPG?raw=true"/></td>
-     <td><img src="https://github.com/everythingbest/dubbo-postman/blob/master/gif/wechatpay.JPG?raw=true"/></td>
-  </tr>
-</table>

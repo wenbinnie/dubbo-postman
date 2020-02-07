@@ -41,11 +41,12 @@ import java.util.*;
 /**
  * 用例相关的操作
  * 用例在这个系统里面指一个接口的请求,目前来说是对一个dubbo接口的请求{@link UserCaseDto}
+ *
  * @author everythingbest
  */
 @Controller
 @RequestMapping("/dubbo-postman/")
-public class TestCaseController extends AbstractController{
+public class TestCaseController extends AbstractController {
 
     static Logger logger = LoggerFactory.getLogger(TestCaseController.class);
 
@@ -54,7 +55,7 @@ public class TestCaseController extends AbstractController{
 
     @RequestMapping(value = "case/save", method = RequestMethod.POST)
     @ResponseBody
-    public WebApiRspDto<Boolean> saveCase(@RequestBody UserCaseDto caseDto){
+    public WebApiRspDto<Boolean> saveCase(@RequestBody UserCaseDto caseDto) {
 
         try {
 
@@ -68,9 +69,9 @@ public class TestCaseController extends AbstractController{
 
             return WebApiRspDto.success(Boolean.TRUE);
 
-        }catch (Exception exp){
+        } catch (Exception exp) {
 
-            logger.error("保存测试case失败",exp);
+            logger.error("保存测试case失败", exp);
 
             return WebApiRspDto.error(exp.getMessage());
         }
@@ -78,7 +79,7 @@ public class TestCaseController extends AbstractController{
 
     @RequestMapping(value = "case/group-case-detail/list", method = RequestMethod.GET)
     @ResponseBody
-    public WebApiRspDto<List<UserCaseDto>> getAllGroupCaseDetail(){
+    public WebApiRspDto<List<UserCaseDto>> getAllGroupCaseDetail() {
 
         List<UserCaseDto> groupDtoList = new ArrayList<>(1);
 
@@ -90,7 +91,7 @@ public class TestCaseController extends AbstractController{
 
                 Set<Object> caseNames = cacheService.mapGetKeys((String) obj);
 
-                for(Object sub : caseNames){
+                for (Object sub : caseNames) {
 
                     String jsonStr = (String) cacheService.mapGet(obj.toString(), sub.toString());
 
@@ -103,17 +104,31 @@ public class TestCaseController extends AbstractController{
 
             return WebApiRspDto.success(groupDtoList);
 
-        }catch (Exception exp){
+        } catch (Exception exp) {
 
-            logger.error("查询所有用例详情失败",exp);
+            logger.error("查询所有用例详情失败", exp);
 
+            return WebApiRspDto.error(exp.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "case/group/add", method = RequestMethod.GET)
+    @ResponseBody
+    public WebApiRspDto<String> addGroup(@RequestParam(value = "key") String key,
+                                         @RequestParam(value = "hashKey") String hashKey,
+                                         @RequestParam(value = "value") String value) {
+        try {
+            cacheService.mapPut(key, hashKey, value);
+            return WebApiRspDto.success("添加成功");
+        } catch (Exception exp) {
+            logger.error("添加失败", exp);
             return WebApiRspDto.error(exp.getMessage());
         }
     }
 
     @RequestMapping(value = "case/group/list", method = RequestMethod.GET)
     @ResponseBody
-    public WebApiRspDto<List<UserCaseGroupDto>> getAllGroupAndCaseName(){
+    public WebApiRspDto<List<UserCaseGroupDto>> getAllGroupAndCaseName() {
 
         List<UserCaseGroupDto> groupDtoList = new ArrayList<>(1);
 
@@ -132,7 +147,7 @@ public class TestCaseController extends AbstractController{
                 List<UserCaseGroupDto> children = new ArrayList<>(1);
                 parentDto.setChildren(children);
 
-                for(Object sub : caseNames){
+                for (Object sub : caseNames) {
 
                     UserCaseGroupDto dto = new UserCaseGroupDto();
                     dto.setValue(sub.toString());
@@ -146,17 +161,29 @@ public class TestCaseController extends AbstractController{
 
             return WebApiRspDto.success(groupDtoList);
 
-        }catch (Exception exp){
+        } catch (Exception exp) {
 
-            logger.error("查询组和组内部case失败",exp);
+            logger.error("查询组和组内部case失败", exp);
 
+            return WebApiRspDto.error(exp.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "case/group-name/add", method = RequestMethod.GET)
+    @ResponseBody
+    public WebApiRspDto<String> addGroupName(@RequestParam(value = "value") String value) {
+        try {
+            cacheService.setAdd(RedisKeys.CASE_KEY, value);
+            return WebApiRspDto.success("添加成功");
+        } catch (Exception exp) {
+            logger.error("添加失败", exp);
             return WebApiRspDto.error(exp.getMessage());
         }
     }
 
     @RequestMapping(value = "case/group-name/list", method = RequestMethod.GET)
     @ResponseBody
-    public WebApiRspDto<List<String>> getAllGroupName(){
+    public WebApiRspDto<List<String>> getAllGroupName() {
 
         List<String> groupDtoList = new ArrayList<>(1);
 
@@ -179,9 +206,9 @@ public class TestCaseController extends AbstractController{
 
             return WebApiRspDto.success(groupDtoList);
 
-        }catch (Exception exp){
+        } catch (Exception exp) {
 
-            logger.error("查询所有组名失败",exp);
+            logger.error("查询所有组名失败", exp);
 
             return WebApiRspDto.error(exp.getMessage());
         }
@@ -190,7 +217,7 @@ public class TestCaseController extends AbstractController{
     @RequestMapping(value = "case/detail", method = RequestMethod.GET)
     @ResponseBody
     public WebApiRspDto<UserCaseDto> queryCaseDetail(@RequestParam(value = "groupName") String groupName,
-                                                     @RequestParam(value = "caseName")String caseName){
+                                                     @RequestParam(value = "caseName") String caseName) {
 
         try {
 
@@ -198,13 +225,13 @@ public class TestCaseController extends AbstractController{
 
             UserCaseDto caseDto = JSON.parseObject(jsonStr, UserCaseDto.class);
 
-            if(caseDto.getClassName() == null){
+            if (caseDto.getClassName() == null) {
 
-                Map<String,String> classNameMap = getAllClassName(caseDto.getZkAddress(),caseDto.getServiceName());
+                Map<String, String> classNameMap = getAllClassName(caseDto.getZkAddress(), caseDto.getServiceName());
 
-                for(Map.Entry<String,String> item : classNameMap.entrySet()){
+                for (Map.Entry<String, String> item : classNameMap.entrySet()) {
 
-                    if(item.getValue().equals(caseDto.getProviderName())){
+                    if (item.getValue().equals(caseDto.getProviderName())) {
 
                         caseDto.setClassName(item.getKey());
 
@@ -215,9 +242,9 @@ public class TestCaseController extends AbstractController{
 
             return WebApiRspDto.success(caseDto);
 
-        }catch (Exception exp){
+        } catch (Exception exp) {
 
-            logger.error("查询case失败",exp);
+            logger.error("查询case失败", exp);
 
             return WebApiRspDto.error(exp.getMessage());
         }
@@ -226,7 +253,7 @@ public class TestCaseController extends AbstractController{
     @RequestMapping(value = "case/delete", method = RequestMethod.GET)
     @ResponseBody
     public WebApiRspDto<String> deleteDetail(@RequestParam(value = "groupName") String groupName,
-                                             @RequestParam(value = "caseName")String caseName){
+                                             @RequestParam(value = "caseName") String caseName) {
 
         try {
 
@@ -234,9 +261,9 @@ public class TestCaseController extends AbstractController{
 
             return WebApiRspDto.success("删除成功");
 
-        }catch (Exception exp){
+        } catch (Exception exp) {
 
-            logger.error("查询case失败",exp);
+            logger.error("查询case失败", exp);
 
             return WebApiRspDto.error(exp.getMessage());
         }

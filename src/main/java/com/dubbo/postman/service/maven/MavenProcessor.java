@@ -57,88 +57,88 @@ public class MavenProcessor {
                            String groupId,
                            String artifactId,
                            String version,
-                           LogResultPrintStream resultPrintStream){
-    
-        String pomPath = downPomAndJar(serviceDirName,groupId,artifactId,version,resultPrintStream);
+                           LogResultPrintStream resultPrintStream) {
+
+        String pomPath = downPomAndJar(serviceDirName, groupId, artifactId, version, resultPrintStream);
 
         logger.info("构建完成30%...");
 
-        if(pomPath == null){
+        if (pomPath == null) {
 
             return false;
         }
 
-        return mavenCopyDependencies(pomPath,resultPrintStream);
+        return mavenCopyDependencies(pomPath, resultPrintStream);
     }
-    
-    private String downPomAndJar(String serviceName, String groupId, String artifactId, String version, LogResultPrintStream resultPrintStream){
+
+    private String downPomAndJar(String serviceName, String groupId, String artifactId, String version, LogResultPrintStream resultPrintStream) {
 
         resultPrintStream.println("准备下载api.jar文件...");
-        resultPrintStream.println("groupId:"+groupId);
-        resultPrintStream.println("artifactId:"+artifactId);
-        resultPrintStream.println("version:"+version);
+        resultPrintStream.println("groupId:" + groupId);
+        resultPrintStream.println("artifactId:" + artifactId);
+        resultPrintStream.println("version:" + version);
 
-        String jarUrl = buildJarUrl(groupId,artifactId,version);
-        resultPrintStream.println("api.jar的url:"+jarUrl);
+        String jarUrl = buildJarUrl(groupId, artifactId, version);
+        resultPrintStream.println("api.jar的url:" + jarUrl);
 
-        String pomUrl = buildPomUrl(groupId,artifactId,version);
-        resultPrintStream.println("构建api.jar的pom.xml文件的url:"+pomUrl);
+        String pomUrl = buildPomUrl(groupId, artifactId, version);
+        resultPrintStream.println("构建api.jar的pom.xml文件的url:" + pomUrl);
 
-        String basePath = fileBasePath+"/"+serviceName;
-        
+        String basePath = fileBasePath + "/" + serviceName;
+
         File file = new File(basePath);
-        
-        if(file.exists()){
-            
+
+        if (file.exists()) {
+
             file.delete();
         }
-    
+
         file.mkdir();
-        
-        String jarPath = fileBasePath+"/"+serviceName+"/lib";
-    
+
+        String jarPath = fileBasePath + "/" + serviceName + "/lib";
+
         File libfile = new File(jarPath);
-    
-        if(libfile.exists()){
-        
+
+        if (libfile.exists()) {
+
             file.delete();
         }
-    
+
         libfile.mkdir();
 
-        resultPrintStream.println("api.jar下载路径:"+jarPath);
+        resultPrintStream.println("api.jar下载路径:" + jarPath);
 
         String pomPath = basePath;
 
-        resultPrintStream.println("pom.xml的下载路径:"+pomPath);
+        resultPrintStream.println("pom.xml的下载路径:" + pomPath);
 
         try {
 
-            resultPrintStream.println("开始下载:"+artifactId + ".jar文件");
+            resultPrintStream.println("开始下载:" + artifactId + ".jar文件");
 
             doDownLoadFile(jarUrl, jarPath, artifactId + ".jar");
 
-            resultPrintStream.println("下载:"+artifactId + ".jar文件成功");
+            resultPrintStream.println("下载:" + artifactId + ".jar文件成功");
 
-            resultPrintStream.println("开始下载:"+artifactId + "的pom.xml文件");
+            resultPrintStream.println("开始下载:" + artifactId + "的pom.xml文件");
 
             doDownLoadFile(pomUrl, pomPath, "pom.xml");
 
-            resultPrintStream.println("下载:"+artifactId + "的pom.xml文件成功");
+            resultPrintStream.println("下载:" + artifactId + "的pom.xml文件成功");
 
-        }catch (IOException exp){
+        } catch (IOException exp) {
 
-            resultPrintStream.println("[ERROR]下载pom.xml或api.jar文件失败:"+exp.getMessage());
-            logger.warn("下载pom或jar失败:",exp);
-            
+            resultPrintStream.println("[ERROR]下载pom.xml或api.jar文件失败:" + exp.getMessage());
+            logger.warn("下载pom或jar失败:", exp);
+
             return null;
         }
-        
+
         return pomPath;
     }
-    
-    boolean mavenCopyDependencies(String pomPath, LogResultPrintStream resultPrintStream){
-    
+
+    boolean mavenCopyDependencies(String pomPath, LogResultPrintStream resultPrintStream) {
+
         MavenCli cli = new MavenCli();
 
         resultPrintStream.println("处理api.jar的所有依赖,通过执行maven命令: 'mvn dependency:copy-dependencies"
@@ -146,109 +146,144 @@ public class MavenProcessor {
 
         resultPrintStream.println("开发执行maven命令");
 
-        System.setProperty("maven.multiModuleProjectDirectory","./");
+        System.setProperty("maven.multiModuleProjectDirectory", "./");
 
         int result = cli.doMain(new String[]{
-                                              "dependency:copy-dependencies",
-                                              "-DoutputDirectory=./lib",
-                                              "-DexcludeScope=provided ",
-                                              "-U"}, pomPath, resultPrintStream, resultPrintStream);
+                "dependency:copy-dependencies",
+                "-DoutputDirectory=./lib",
+                "-DexcludeScope=provided ",
+                "-U"}, pomPath, resultPrintStream, resultPrintStream);
 
 
         boolean success = (result == 0);
 
-        logger.info("构建完成100%,构建结果:{}",success);
+        logger.info("构建完成100%,构建结果:{}", success);
 
         resultPrintStream.setSuccess(success);
 
         if (success) {
 
-            resultPrintStream.println("maven执行成功,文件路径:"+pomPath);
+            resultPrintStream.println("maven执行成功,文件路径:" + pomPath);
 
             return true;
         } else {
 
-            resultPrintStream.println("maven执行失败,文件路径:"+pomPath);
-            logger.warn("maven执行失败,文件路径:"+pomPath);
-    
+            resultPrintStream.println("maven执行失败,文件路径:" + pomPath);
+            logger.warn("maven执行失败,文件路径:" + pomPath);
+
             return false;
         }
     }
-    
-    void doDownLoadFile(String baseUrl,String filePath,String fileName) throws IOException{
-    
-        URL httpUrl=new URL(baseUrl);
-    
-        HttpURLConnection conn=(HttpURLConnection) httpUrl.openConnection();
-    
+
+    void doDownLoadFile(String baseUrl, String filePath, String fileName) throws IOException {
+
+        URL httpUrl = new URL(baseUrl);
+
+        HttpURLConnection conn = (HttpURLConnection) httpUrl.openConnection();
+
         conn.setDoInput(true);
-    
+
         conn.setDoOutput(true);
-    
+
         conn.connect();
-    
+
         InputStream inputStream = conn.getInputStream();
-    
+
         BufferedInputStream bis = new BufferedInputStream(inputStream);
-    
+
         //判断文件的保存路径后面是否以/结尾
         if (!filePath.endsWith("/")) {
-        
+
             filePath += "/";
-        
+
         }
-    
-        FileOutputStream fileOut = new FileOutputStream(filePath+fileName);
-    
+
+        FileOutputStream fileOut = new FileOutputStream(filePath + fileName);
+
         BufferedOutputStream bos = new BufferedOutputStream(fileOut);
-    
+
         byte[] buf = new byte[4096];
         int length = bis.read(buf);
         //保存文件
-        while(length != -1)
-        {
+        while (length != -1) {
             bos.write(buf, 0, length);
             length = bis.read(buf);
         }
-        
+
         bos.close();
         bis.close();
         conn.disconnect();
     }
-    
-    String buildJarUrl(String groupId,String artifactId,String version){
-        
+
+    String buildJarUrl(String groupId, String artifactId, String version) {
+
         String upperV = version.trim().toUpperCase();
-        
+
         String suffixUrl;
-        
-        if(upperV.endsWith("SNAPSHOT")){
-        
-            suffixUrl = "?r="+"snapshots&g="+groupId+"&a="+artifactId+"&v="+version+"&e=jar";
-        
-        }else{
-        
-            suffixUrl = "?r="+"releases&g="+groupId+"&a="+artifactId+"&v="+version+"&e=jar";
+
+        if (upperV.endsWith("SNAPSHOT")) {
+
+            suffixUrl = "?r=" + "snapshots&g=" + groupId + "&a=" + artifactId + "&v=" + version + "&e=jar";
+
+        } else {
+
+//            http://localhost:8081/repository/maven-releases/com/imooc/dubbo-demo-api/1.0/dubbo-demo-api-1.0.jar
+
+
+//            StringBuilder sb = new StringBuilder();
+//            String[] tmp = groupId.split("\\.");
+//            for (String s : tmp) {
+//                sb.append(s).append("/");
+//            }
+//            sb.append(artifactId).append("/");
+//            sb.append(version).append("/");
+            StringBuilder sb = constructPrefix(groupId, artifactId, version);
+            sb.append(artifactId).append("-").append(version).append(".jar");
+            suffixUrl = sb.toString();
+
+//            suffixUrl = "?r="+"releases&g="+groupId+"&a="+artifactId+"&v="+version+"&e=jar";
         }
-        
-        return nexusUrl+suffixUrl;
+
+        return nexusUrl + suffixUrl;
     }
-    
-    String buildPomUrl(String groupId,String artifactId,String version){
-        
+
+    String buildPomUrl(String groupId, String artifactId, String version) {
+
         String upperV = version.trim().toUpperCase();
-    
+
         String suffixUrl;
-    
-        if(upperV.endsWith("SNAPSHOT")){
-        
-            suffixUrl = "?r="+"snapshots&g="+groupId+"&a="+artifactId+"&v="+version+"&e=pom";
-        
-        }else{
-        
-            suffixUrl = "?r="+"releases&g="+groupId+"&a="+artifactId+"&v="+version+"&e=pom";
+
+        if (upperV.endsWith("SNAPSHOT")) {
+
+            suffixUrl = "?r=" + "snapshots&g=" + groupId + "&a=" + artifactId + "&v=" + version + "&e=pom";
+
+        } else {
+
+//            StringBuilder sb = new StringBuilder();
+//            String[] tmp = groupId.split("\\.");
+//            for (String s : tmp) {
+//                sb.append(s).append("/");
+//            }
+//            sb.append(artifactId).append("/");
+//            sb.append(version).append("/");
+            StringBuilder sb = constructPrefix(groupId, artifactId, version);
+            sb.append(artifactId).append("-").append(version).append(".pom");
+            suffixUrl = sb.toString();
+
+//            suffixUrl = "?r="+"releases&g="+groupId+"&a="+artifactId+"&v="+version+"&e=pom";
         }
-    
-        return nexusUrl+suffixUrl;
+
+        return nexusUrl + suffixUrl;
+    }
+
+    StringBuilder constructPrefix(String groupId, String artifactId, String version) {
+        StringBuilder sb = new StringBuilder();
+        String[] tmp = groupId.split("\\.");
+        for (String s : tmp) {
+            sb.append(s).append("/");
+        }
+        sb.append(artifactId).append("/");
+        sb.append(version).append("/");
+        return sb;
     }
 }
